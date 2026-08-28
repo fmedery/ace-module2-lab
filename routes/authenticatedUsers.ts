@@ -8,6 +8,12 @@ import { decode } from 'jsonwebtoken'
 import * as security from '../lib/insecurity'
 
 async function retrieveUserList (req: Request, res: Response, next: NextFunction) {
+  const loggedInUser = security.authenticatedUsers.from(req)
+  if (!loggedInUser) {
+    next(new Error('Blocked illegal activity by ' + req.socket.remoteAddress))
+    return
+  }
+
   try {
     const users = await UserModel.findAll()
 
